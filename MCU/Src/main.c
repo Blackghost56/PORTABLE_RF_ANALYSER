@@ -48,7 +48,9 @@ ADC_HandleTypeDef hadc3;
 DMA_HandleTypeDef hdma_adc1;
 
 /* USER CODE BEGIN PV */
-volatile uint32_t ADCDataBuf[3];
+#define ADCBufSize 3
+
+volatile uint32_t ADCDataBuf[ADCBufSize];
 
 /* USER CODE END PV */
 
@@ -118,7 +120,7 @@ int main(void)
   }
   
   /*##-10- Start ADC1 conversion process and enable DMA #######################*/  
-  if(HAL_ADCEx_MultiModeStart_DMA(&hadc1, (uint32_t*)ADCDataBuf, 3) != HAL_OK)
+  if(HAL_ADCEx_MultiModeStart_DMA(&hadc1, (uint32_t*)ADCDataBuf, ADCBufSize) != HAL_OK)
   {
     /* Start Error */
     Error_Handler();
