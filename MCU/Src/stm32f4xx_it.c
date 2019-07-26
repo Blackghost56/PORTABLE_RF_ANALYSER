@@ -237,11 +237,11 @@ void EXTI15_10_IRQHandler(void)
 void DMA2_Stream0_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA2_Stream0_IRQn 0 */
-	if (ADCDataBuf[10] != 0){
+	/*if (ADCDataBuf[17] != 0){
 		HAL_ADCEx_MultiModeStop_DMA(&hadc1);
 		HAL_ADC_Stop(&hadc2);
 		HAL_ADC_Stop(&hadc3);
-	}
+	}*/
   /* USER CODE END DMA2_Stream0_IRQn 0 */
   HAL_DMA_IRQHandler(&hdma_adc1);
   /* USER CODE BEGIN DMA2_Stream0_IRQn 1 */
