@@ -1,8 +1,15 @@
 --cpu=Cortex-M4.fp
 "mcu\startup_stm32f407xx.o"
 "mcu\main.o"
+"mcu\usb_device.o"
+"mcu\usbd_conf.o"
+"mcu\usbd_desc.o"
+"mcu\usbd_cdc_if.o"
 "mcu\stm32f4xx_it.o"
 "mcu\stm32f4xx_hal_msp.o"
+"mcu\stm32f4xx_hal_pcd.o"
+"mcu\stm32f4xx_hal_pcd_ex.o"
+"mcu\stm32f4xx_ll_usb.o"
 "mcu\stm32f4xx_hal_adc.o"
 "mcu\stm32f4xx_hal_adc_ex.o"
 "mcu\stm32f4xx_hal_tim.o"
@@ -21,6 +28,10 @@
 "mcu\stm32f4xx_hal.o"
 "mcu\stm32f4xx_hal_exti.o"
 "mcu\system_stm32f4xx.o"
+"mcu\usbd_core.o"
+"mcu\usbd_ctlreq.o"
+"mcu\usbd_ioreq.o"
+"mcu\usbd_cdc.o"
 --library_type=microlib --strict --scatter "MCU\MCU.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers
