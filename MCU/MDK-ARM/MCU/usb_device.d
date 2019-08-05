@@ -46,3 +46,4 @@ mcu\usb_device.o: ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ctlre
 mcu\usb_device.o: ../Inc/usbd_desc.h
 mcu\usb_device.o: ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc/usbd_cdc.h
 mcu\usb_device.o: ../Inc/usbd_cdc_if.h
+mcu\usb_device.o: ../Inc/queue_array.h

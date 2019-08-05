@@ -425,6 +425,11 @@
               <FileType>1</FileType>
               <FilePath>../Src/stm32f4xx_hal_msp.c</FilePath>
             </File>
+            <File>
+              <FileName>queue_array.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\queue_array.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

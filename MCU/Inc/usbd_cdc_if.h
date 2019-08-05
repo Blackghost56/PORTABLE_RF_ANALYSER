@@ -31,7 +31,9 @@
 #include "usbd_cdc.h"
 
 /* USER CODE BEGIN INCLUDE */
-
+//#include "queue.h"
+#include "queue_array.h"
+	 
 /* USER CODE END INCLUDE */
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
@@ -49,6 +51,7 @@
   * @{
   */
 /* USER CODE BEGIN EXPORTED_DEFINES */
+#define USBBufRxSize 8
 
 /* USER CODE END EXPORTED_DEFINES */
 

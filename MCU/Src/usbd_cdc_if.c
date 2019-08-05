@@ -32,7 +32,9 @@
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-
+//uint8_t USBBufRx[USBBufRxSize];
+extern struct CQueue	USBBufRxQ;
+extern int USBBufRxQOverload;
 /* USER CODE END PV */
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
@@ -263,9 +265,15 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
 static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
 {
   /* USER CODE BEGIN 6 */
-	HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_12);
+	//HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_12);
   USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
   USBD_CDC_ReceivePacket(&hUsbDeviceFS);
+	//memcpy(USBBufRx, Buf, USBBufRxSize);
+	
+	USBBufRxQOverload = CQueuePush(&USBBufRxQ, Buf, USBBufRxSize);
+	//CQueuePushBuf(&USBBufRxQ, USBBufRx, USBBufRxSize, &USBBufRxQOverload);
+	//void CQueuePushBuf(struct CQueue *queue, DATA_TYPE data[], int data_length, int *state);
+	//CDC_Transmit_FS(Buf, (uint32_t)Len);
   return (USBD_OK);
   /* USER CODE END 6 */
 }

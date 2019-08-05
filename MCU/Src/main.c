@@ -26,6 +26,7 @@
 /* USER CODE BEGIN Includes */
 #include "usbd_cdc_if.h"
 
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -50,11 +51,18 @@ ADC_HandleTypeDef hadc3;
 DMA_HandleTypeDef hdma_adc1;
 
 /* USER CODE BEGIN PV */
-#define ADCBufSize 30
-#define DataToUSBSendSize 8
 
-volatile uint32_t ADCDataBuf[ADCBufSize];
-uint8_t DataToUSBSend[DataToUSBSendSize];
+
+
+struct CustomADCStruct CADC;
+
+
+
+uint8_t USBBufTx[USBBufTxSize];
+
+struct CQueue	USBBufRxQ;
+int USBBufRxQOverload = 1;
+
 
 /* USER CODE END PV */
 
@@ -82,7 +90,13 @@ static void MX_ADC3_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
+	CQueueInit(&USBBufRxQ, USBBufRxQSize);
+	
+	// ADC custom struct init 
+	CADC.ADCConvCompltFlag = 0;
+	CADC.ADCState = STATE_OFF;
 
+	
   /* USER CODE END 1 */
   
 
@@ -110,29 +124,18 @@ int main(void)
   MX_ADC3_Init();
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 2 */
-	 /*##-8- Start ADC3 conversion process ######################################*/
   if(HAL_ADC_Start(&hadc3) != HAL_OK)
-  {
-    /* Start Error */
     Error_Handler();
-  }
-  
-  /*##-9- Start ADC2 conversion process ######################################*/
   if(HAL_ADC_Start(&hadc2) != HAL_OK)
-  {
-    /* Start Error */
     Error_Handler();
-  }
-  
-  /*##-10- Start ADC1 conversion process and enable DMA #######################*/  
-  if(HAL_ADCEx_MultiModeStart_DMA(&hadc1, (uint32_t*)ADCDataBuf, ADCBufSize) != HAL_OK)
-  {
-    /* Start Error */
+  if(HAL_ADCEx_MultiModeStart_DMA(&hadc1, (uint32_t*)CADC.ADCDataBuf, ADCBufSize) != HAL_OK)
     Error_Handler();
-  }
+	CADC.ADCState = STATE_ON;
+	CADC.ADCStartTime = SysTick->VAL;
 	
-	int i = 0;
-	DataToUSBSend[7] = '\n';
+	//volatile int i = 0;
+	//volatile uint8_t res = 0;
+	//USBBufTx[7] = '\n';
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -143,10 +146,100 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 		
-		HAL_Delay(1000);
-    CDC_Transmit_FS(DataToUSBSend, DataToUSBSendSize);
-		DataToUSBSend[0] = i;
+		
+    //CDC_Transmit_FS(USBBufTx, USBBufTxSize);
+		//DataToUSBSend[0] = i;
+	
+		/*HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_13);
+		push(&USBBufRxQ, i);
 		i++;
+		push(&USBBufRxQ, i);
+		res = pop(&USBBufRxQ);
+		res = pop(&USBBufRxQ);
+		HAL_Delay(1000);*/
+		
+		if ((CADC.ADCConvCompltFlag == 1) || ((CADC.ADCState == STATE_ON) && (CADC.ADCStartTime > ADC_WHATCHDOG_TIMEOUT))){
+	//		(ADCConvCompltFlag == 0) && ((ADC->CSR & ADC_CSR_OVR1_Msk) >> ADC_CSR_OVR1_Pos == 0) && ((ADC->CSR & ADC_CSR_OVR2_Msk) >> ADC_CSR_OVR2_Pos == 1) 
+	//	&& ((ADC->CSR & ADC_CSR_OVR3_Msk) >> ADC_CSR_OVR3_Pos == 1))){
+			CADC.ADCConvCompltFlag = 0;
+			/*if(HAL_ADC_Stop(&hadc3) != HAL_OK)
+				Error_Handler();
+			if(HAL_ADC_Stop(&hadc2) != HAL_OK)
+				Error_Handler();
+			if(HAL_ADCEx_MultiModeStop_DMA(&hadc1) != HAL_OK)
+				Error_Handler();*/
+			//HAL_Delay(100);
+			if(HAL_ADCEx_MultiModeStop_DMA(&hadc1) != HAL_OK)
+				Error_Handler();
+			//if(HAL_ADC_Stop(&hadc1) != HAL_OK)
+			//	Error_Handler();
+			if(HAL_ADC_Stop(&hadc2) != HAL_OK)
+				Error_Handler();
+			if(HAL_ADC_Stop(&hadc3) != HAL_OK)
+				Error_Handler();
+			CADC.ADCState = STATE_OFF;
+			memcpy(USBBufTx, CADC.ADCDataBuf, ADCBufSize);
+			USBBufTx[USBBufTxSize - 1] = '\r';
+			CDC_Transmit_FS(USBBufTx, USBBufTxSize);
+			
+			//HAL_Delay(10);
+			
+
+			
+			//MX_DMA_Init();
+			MX_ADC1_Init();
+			MX_ADC2_Init();
+			MX_ADC3_Init();
+			if(HAL_ADC_Start(&hadc3) != HAL_OK)
+				Error_Handler();
+			if(HAL_ADC_Start(&hadc2) != HAL_OK)
+				Error_Handler();
+			//if(HAL_ADC_Start(&hadc1) != HAL_OK)
+			//	Error_Handler();
+			if(HAL_ADCEx_MultiModeStart_DMA(&hadc1, (uint32_t*)CADC.ADCDataBuf, ADCBufSize) != HAL_OK)
+				Error_Handler();
+			CADC.ADCState = STATE_ON;
+			CADC.ADCStartTime = 0;
+			
+			HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_14);
+		}
+		HAL_Delay(20);
+		
+		
+		if (USBBufRxQ.current_size != 0){
+			uint8_t CMD[USBBufRxQSize][USBBufRxSize];
+			int i = 0;
+			while (CQueuePop(&USBBufRxQ, CMD[i], USBBufRxSize) == 1){
+				//CDC_Transmit_FS(CMD[i], USBBufRxSize);
+				i++;
+			}
+			
+			if (USBBufRxQOverload == 0){
+				USBBufTx[0] = 77;
+				USBBufTx[1] = 55;
+				//CDC_Transmit_FS(USBBufTx, USBBufTxSize);
+				HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_13);
+			}
+			//HAL_Delay(100);
+			
+			
+			int count = 0;
+			for (int m = 0; m < USBBufRxQSize; m++){
+					for (int j = 0; j < USBBufRxSize; j++){
+						USBBufTx[count] = CMD[m][j];
+						count++;
+					}
+			}
+			CDC_Transmit_FS(USBBufTx, i*USBBufRxSize);
+			
+			for (i = 0; i < USBBufRxQSize; i++){
+					for (int j = 0; j < USBBufRxSize; j++){
+						CMD[i][j] = 0;
+					}
+			}
+		}
+		//HAL_Delay(5000);
+		
   }
   /* USER CODE END 3 */
 }
@@ -223,7 +316,7 @@ static void MX_ADC1_Init(void)
   hadc1.Init.ExternalTrigConv = ADC_EXTERNALTRIGCONV_Ext_IT11;
   hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
   hadc1.Init.NbrOfConversion = 1;
-  hadc1.Init.DMAContinuousRequests = ENABLE;
+  hadc1.Init.DMAContinuousRequests = DISABLE;
   hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
   if (HAL_ADC_Init(&hadc1) != HAL_OK)
   {
@@ -413,6 +506,7 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc){
+	CADC.ADCConvCompltFlag =	1;
 	//HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_0);
 	/*if (hadc == &hadc1){
 		HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_0);
@@ -431,7 +525,8 @@ void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
-	
+	HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_15);
+	printf("Error");
   /* USER CODE END Error_Handler_Debug */
 }
 

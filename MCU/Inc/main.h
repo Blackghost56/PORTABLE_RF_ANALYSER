@@ -47,14 +47,26 @@ extern "C" {
 
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
-
+#define ADCBufSize 40
+#define USBBufTxSize 80
+#define USBBufRxQSize 10
+#define ADC_WHATCHDOG_TIMEOUT 1000		// ms
+#define STATE_OFF 0
+#define STATE_ON  1
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-
+struct CustomADCStruct{
+//volatile uint32_t ADCDataBuf[ADCBufSize];
+//uint32_t ADCDataBuf[ADCBufSize];
+	uint16_t ADCDataBuf[ADCBufSize];
+	uint8_t ADCConvCompltFlag;
+	uint8_t ADCState;
+	uint16_t ADCStartTime;
+};
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

@@ -62,7 +62,9 @@ extern ADC_HandleTypeDef hadc1;
 extern ADC_HandleTypeDef hadc2;
 extern ADC_HandleTypeDef hadc3;
 /* USER CODE BEGIN EV */
-extern volatile uint32_t ADCDataBuf[30];
+//extern volatile uint32_t ADCDataBuf[30];
+//extern uint8_t ADCConvCompltFlag;
+extern struct CustomADCStruct CADC;
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -190,7 +192,10 @@ void SysTick_Handler(void)
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
   /* USER CODE BEGIN SysTick_IRQn 1 */
-
+	if (CADC.ADCState == STATE_ON)
+	{
+		CADC.ADCStartTime++;
+	}
   /* USER CODE END SysTick_IRQn 1 */
 }
 
@@ -246,7 +251,7 @@ void DMA2_Stream0_IRQHandler(void)
   /* USER CODE END DMA2_Stream0_IRQn 0 */
   HAL_DMA_IRQHandler(&hdma_adc1);
   /* USER CODE BEGIN DMA2_Stream0_IRQn 1 */
-
+	//ADCConvCompltFlag =	1;
   /* USER CODE END DMA2_Stream0_IRQn 1 */
 }
 
