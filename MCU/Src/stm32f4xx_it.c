@@ -23,6 +23,7 @@
 #include "stm32f4xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "CADC.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -192,9 +193,9 @@ void SysTick_Handler(void)
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
   /* USER CODE BEGIN SysTick_IRQn 1 */
-	if (CADC.ADCState == STATE_ON)
+	if (CADC.state == STATE_ON)
 	{
-		CADC.ADCStartTime++;
+		CADC.startTime++;
 	}
   /* USER CODE END SysTick_IRQn 1 */
 }
@@ -233,7 +234,7 @@ void EXTI15_10_IRQHandler(void)
   /* USER CODE END EXTI15_10_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_11);
   /* USER CODE BEGIN EXTI15_10_IRQn 1 */
-
+	//CADC.triggerEvent++;
   /* USER CODE END EXTI15_10_IRQn 1 */
 }
 

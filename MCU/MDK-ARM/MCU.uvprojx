@@ -430,6 +430,16 @@
               <FileType>1</FileType>
               <FilePath>..\Src\queue_array.c</FilePath>
             </File>
+            <File>
+              <FileName>CADC.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\CADC.c</FilePath>
+            </File>
+            <File>
+              <FileName>CUSB.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\CUSB.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

@@ -270,7 +270,8 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
   USBD_CDC_ReceivePacket(&hUsbDeviceFS);
 	//memcpy(USBBufRx, Buf, USBBufRxSize);
 	
-	USBBufRxQOverload = CQueuePush(&USBBufRxQ, Buf, USBBufRxSize);
+	if (CQueuePush(&USBBufRxQ, Buf, USBBufRxSize) == 0)
+		USBBufRxQOverload++;
 	//CQueuePushBuf(&USBBufRxQ, USBBufRx, USBBufRxSize, &USBBufRxQOverload);
 	//void CQueuePushBuf(struct CQueue *queue, DATA_TYPE data[], int data_length, int *state);
 	//CDC_Transmit_FS(Buf, (uint32_t)Len);
