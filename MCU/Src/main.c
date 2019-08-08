@@ -27,6 +27,7 @@
 #include "usbd_cdc_if.h"
 #include "CUSB.h"
 #include "CADC.h"
+#include "tools.h"
 
 
 /* USER CODE END Includes */
@@ -58,7 +59,8 @@ struct CustomADCStruct CADC;
 uint8_t USBBufTx[USBBufTxSize];
 struct CQueue	USBBufRxQ;
 int USBBufRxQOverload = 0;
-
+uint8_t		triggerEvent;
+uint16_t 	ADCBufSize = ADC_BUF_SIZE_DEFAULT;
 
 /* USER CODE END PV */
 
@@ -89,11 +91,12 @@ int main(void)
   /* USER CODE BEGIN 1 */
 	CQueueInit(&USBBufRxQ, USBBufRxQSize);
 	
-	// ADC custom struct init 
+	// ADC custom struct init
+	CADC.data = (uint16_t *)malloc(sizeof(uint16_t) * ADC_BUF_SIZE_DEFAULT);
 	CADC.convCompltFlag = 0;
 	CADC.state = STATE_OFF;
 	//CADC.triggerEvent = 0;
-
+	triggerEvent = 0;
 	
   /* USER CODE END 1 */
   
@@ -421,9 +424,10 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc){
 
 void ADC_ContConv_handler(){
 	if ((CADC.convCompltFlag == 1) || ((CADC.state == STATE_ON) && (CADC.startTime > ADC_WHATCHDOG_TIMEOUT))){
-	//if ((CADC.convCompltFlag == 1) || ((CADC.state == STATE_ON) && (CADC.startTime > ADC_WHATCHDOG_TIMEOUT) && (CADC.triggerEvent > 0))){
+	//if ((CADC.convCompltFlag == 1) || ((CADC.state == STATE_ON) && (CADC.startTime > ADC_WHATCHDOG_TIMEOUT) && (triggerEvent > 0))){
 		CADC.convCompltFlag = 0;
 		//CADC.triggerEvent = 0;
+		triggerEvent = 0;
 		if(HAL_ADCEx_MultiModeStop_DMA(&hadc1) != HAL_OK)
 			Error_Handler();
 		//if(HAL_ADC_Stop(&hadc1) != HAL_OK)
@@ -433,13 +437,17 @@ void ADC_ContConv_handler(){
 		if(HAL_ADC_Stop(&hadc3) != HAL_OK)
 			Error_Handler();
 		CADC.state = STATE_OFF;
-		//memcpy(USBBufTx, CADC.ADCDataBuf, ADCBufSize);
+		
+		USBBufTx[0]= USB_0_DATA;
+		USBBufTx[1] = USB_1_DATA_ADC_CONTCONV;
+		memcpy(&USBBufTx[2], CADC.data, ADCBufSize);
 		//USBBufTx[USBBufTxSize - 1] = '\r';
 		//CDC_Transmit_FS(USBBufTx, USBBufTxSize);
 		//CADC.ADCDataBuf[0] = USB_0_DATA;
 		//CADC.ADCDataBuf[1] = USB_1_DATA_ADC_CONTCONV;
-		//CDC_Transmit_FS((uint8_t*)CADC.data, USBBufTxSize);
-		CDC_Transmit_FS((uint8_t*)CADC.data, ADCBufSize);
+		//CDC_Transmit_FS((uint8_t*)CADC.data, ADCBufSize);
+		CDC_Transmit_FS(USBBufTx, ADCBufSize + 2);
+		
 				
 		//MX_DMA_Init();
 		MX_ADC1_Init();
@@ -458,6 +466,27 @@ void ADC_ContConv_handler(){
 		
 		//HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_14);
 	}
+}
+
+uint8_t ADC_dataBuf_resize(uint16_t size, uint8_t *state_extended){
+	if (CADC.state == STATE_ON){
+		*state_extended = USB_1_ERROR_ADC_SET_BUF_SIZE_ADCRUN;
+		return USB_0_ERROR;
+	}
+	if (size > ADC_MAX_BUF_SIZE){
+		*state_extended = USB_1_ERROR_ADC_SET_BUF_SIZE_UPPERLIMIT;
+		return USB_0_ERROR;
+	}
+	if (size < ADC_MIN_BUF_SIZE){
+		*state_extended = USB_1_ERROR_ADC_SET_BUF_SIZE_LOWERLIMIT;
+		return USB_0_ERROR;
+	}
+	free(CADC.data);
+	CADC.data = (uint16_t *)malloc(sizeof(uint16_t) * size);
+	ADCBufSize = size;
+	
+	*state_extended = USB_1_INFO_ADC_SET_BUF_SIZE_OK;
+	return USB_0_INFO;
 }
 
 void ADCContConvStart(){
@@ -480,6 +509,7 @@ void ADCContConvStart(){
 		Error_Handler();
 	CADC.state = STATE_ON;
 	CADC.startTime = 0;
+	triggerEvent = 0;
 }
 
 void ADCContConvStop(){
@@ -500,18 +530,34 @@ void ADCContConvStop(){
 	CADC.state = STATE_OFF;
 }
 
+void ADCRequestBufSize(){
+		USBBufTx[0] = USB_0_INFO;
+		USBBufTx[1] = USB_1_DATA_ADC_BUF_SIZE;
+		int res =	NumberToRAWMSBFirst(USBBufTx, 2, ADCBufSize, 2);
+		CDC_Transmit_FS(USBBufTx, 4);
+}
+
 void Rx_CMD_handler(uint8_t *data){
-switch (data[1]){
-	case USB_1_CMD_ADC_CONTCONV_START:
-		ADCContConvStart();
-	break;
-	case USB_1_CMD_ADC_CONTCONV_STOP:
-		ADCContConvStop();
-	break;
+	switch (data[1]){
+		case USB_1_CMD_ADC_CONTCONV_START:
+			ADCContConvStart();
+		break;
+		case USB_1_CMD_ADC_CONTCONV_STOP:
+			ADCContConvStop();
+		break;
+		case USB_1_CMD_ADC_REQUEST_BUF_SIZE:
+			ADCRequestBufSize();
+		break;
+		
 	}
 }
 void Rx_DATA_handler(uint8_t *data){
-
+	switch (data[1]){
+		case USB_1_DATA_ADC_BUF_SIZE:
+			USBBufTx[0] = ADC_dataBuf_resize((uint16_t)RAWToNumberMSBFirst(data, 2, 2), &USBBufTx[1]);
+			CDC_Transmit_FS(USBBufTx, 2);
+		break;
+	}
 }
 
 void Rx_ERROR_handler(uint8_t *data){

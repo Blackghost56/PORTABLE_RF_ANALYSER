@@ -48,3 +48,4 @@ mcu\main.o: ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ctlreq.h
 mcu\main.o: ../Inc/queue_array.h
 mcu\main.o: ../Inc/CUSB.h
 mcu\main.o: ../Inc/CADC.h
+mcu\main.o: ../Inc/tools.h

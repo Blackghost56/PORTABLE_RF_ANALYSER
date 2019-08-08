@@ -66,6 +66,7 @@ extern ADC_HandleTypeDef hadc3;
 //extern volatile uint32_t ADCDataBuf[30];
 //extern uint8_t ADCConvCompltFlag;
 extern struct CustomADCStruct CADC;
+extern uint8_t triggerEvent;
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -193,7 +194,7 @@ void SysTick_Handler(void)
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
   /* USER CODE BEGIN SysTick_IRQn 1 */
-	if (CADC.state == STATE_ON)
+	if ((CADC.state == STATE_ON) && (triggerEvent > 0))
 	{
 		CADC.startTime++;
 	}
@@ -234,6 +235,7 @@ void EXTI15_10_IRQHandler(void)
   /* USER CODE END EXTI15_10_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_11);
   /* USER CODE BEGIN EXTI15_10_IRQn 1 */
+	triggerEvent++;
 	//CADC.triggerEvent++;
   /* USER CODE END EXTI15_10_IRQn 1 */
 }
