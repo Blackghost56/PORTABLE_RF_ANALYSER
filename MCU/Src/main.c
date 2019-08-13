@@ -540,10 +540,19 @@ void ADCContConvStop(){
 }
 
 void ADCRequestBufSize(){
-		USBBufTx[0] = USB_0_INFO;
+		USBBufTx[0] = USB_0_DATA;
 		USBBufTx[1] = USB_1_DATA_ADC_BUF_SIZE;
 		int res =	NumberToRAWMSBFirst(USBBufTx, 2, ADCBufSize, 2);
 		CDC_Transmit_FS(USBBufTx, 4);
+}
+
+void ADCRequestState(){
+		USBBufTx[0] = USB_0_INFO;
+		if (CADC.state == STATE_ON)
+			USBBufTx[1] = USB_1_INFO_ADC_STATE_ON;
+		else
+			USBBufTx[1] = USB_1_INFO_ADC_STATE_OFF;
+		CDC_Transmit_FS(USBBufTx, 2);	
 }
 
 void Rx_CMD_handler(uint8_t *data){
@@ -557,6 +566,10 @@ void Rx_CMD_handler(uint8_t *data){
 		case USB_1_CMD_ADC_REQUEST_BUF_SIZE:
 			ADCRequestBufSize();
 		break;
+		case USB_1_CMD_ADC_REQUEST_STATE:
+			ADCRequestState();
+		break;
+		
 		
 	}
 }
