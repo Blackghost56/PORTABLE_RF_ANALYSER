@@ -143,14 +143,14 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>ST-LINKIII-KEIL_SWO</Key>
-          <Name>-U-O142 -O10446 -SF4000 -C0 -A0 -I0 -HNlocalhost -HP7184 -P2 -N00("ARM CoreSight SW-DP") -D00(2BA01477) -L00(0) -TO18 -TC10000000 -TP21 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F4xx_1024.FLM -FS08000000 -FL0100000 -FP0($$Device:STM32F407VGTx$CMSIS\Flash\STM32F4xx_1024.FLM)</Name>
+          <Name>-U-O142 -O2254 -SF4000 -C0 -A0 -I0 -HNlocalhost -HP7184 -P2 -N00("ARM CoreSight SW-DP") -D00(2BA01477) -L00(0) -TO18 -TC10000000 -TP21 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F4xx_1024.FLM -FS08000000 -FL0100000 -FP0($$Device:STM32F407VGTx$CMSIS\Flash\STM32F4xx_1024.FLM)</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
       <Breakpoint>
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>541</LineNumber>
+          <LineNumber>549</LineNumber>
           <EnabledFlag>0</EnabledFlag>
           <Address>134228306</Address>
           <ByteObject>0</ByteObject>
@@ -161,28 +161,12 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>../Src/main.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\MCU\../Src/main.c\541</Expression>
+          <Expression>\\MCU\../Src/main.c\549</Expression>
         </Bp>
         <Bp>
           <Number>1</Number>
           <Type>0</Type>
-          <LineNumber>535</LineNumber>
-          <EnabledFlag>0</EnabledFlag>
-          <Address>134218736</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>../Src/main.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\MCU\../Src/main.c\535</Expression>
-        </Bp>
-        <Bp>
-          <Number>2</Number>
-          <Type>0</Type>
-          <LineNumber>540</LineNumber>
+          <LineNumber>548</LineNumber>
           <EnabledFlag>0</EnabledFlag>
           <Address>134228308</Address>
           <ByteObject>0</ByteObject>
@@ -193,14 +177,30 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>../Src/main.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\MCU\../Src/main.c\540</Expression>
+          <Expression>\\MCU\../Src/main.c\548</Expression>
+        </Bp>
+        <Bp>
+          <Number>2</Number>
+          <Type>0</Type>
+          <LineNumber>544</LineNumber>
+          <EnabledFlag>0</EnabledFlag>
+          <Address>134218740</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>../Src/main.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\MCU\../Src/main.c\544</Expression>
         </Bp>
         <Bp>
           <Number>3</Number>
           <Type>0</Type>
-          <LineNumber>534</LineNumber>
+          <LineNumber>543</LineNumber>
           <EnabledFlag>0</EnabledFlag>
-          <Address>134218728</Address>
+          <Address>134218736</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -209,14 +209,14 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>../Src/main.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\MCU\../Src/main.c\534</Expression>
+          <Expression>\\MCU\../Src/main.c\543</Expression>
         </Bp>
         <Bp>
           <Number>4</Number>
           <Type>0</Type>
-          <LineNumber>533</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134218730</Address>
+          <LineNumber>537</LineNumber>
+          <EnabledFlag>0</EnabledFlag>
+          <Address>134218688</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -225,14 +225,14 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>../Src/main.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\MCU\../Src/main.c\533</Expression>
+          <Expression>\\MCU\../Src/main.c\537</Expression>
         </Bp>
         <Bp>
           <Number>5</Number>
           <Type>0</Type>
           <LineNumber>449</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134218880</Address>
+          <Address>134218878</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -246,7 +246,167 @@
         <Bp>
           <Number>6</Number>
           <Type>0</Type>
+          <LineNumber>542</LineNumber>
+          <EnabledFlag>0</EnabledFlag>
+          <Address>134218728</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>../Src/main.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\MCU\../Src/main.c\542</Expression>
+        </Bp>
+        <Bp>
+          <Number>7</Number>
+          <Type>0</Type>
+          <LineNumber>536</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134218678</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>../Src/main.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\MCU\../Src/main.c\536</Expression>
+        </Bp>
+        <Bp>
+          <Number>8</Number>
+          <Type>0</Type>
+          <LineNumber>545</LineNumber>
+          <EnabledFlag>0</EnabledFlag>
+          <Address>134218758</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>../Src/main.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\MCU\../Src/main.c\545</Expression>
+        </Bp>
+        <Bp>
+          <Number>9</Number>
+          <Type>0</Type>
           <LineNumber>539</LineNumber>
+          <EnabledFlag>0</EnabledFlag>
+          <Address>134218696</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>../Src/main.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\MCU\../Src/main.c\539</Expression>
+        </Bp>
+        <Bp>
+          <Number>10</Number>
+          <Type>0</Type>
+          <LineNumber>538</LineNumber>
+          <EnabledFlag>0</EnabledFlag>
+          <Address>134218692</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>../Src/main.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\MCU\../Src/main.c\538</Expression>
+        </Bp>
+        <Bp>
+          <Number>11</Number>
+          <Type>0</Type>
+          <LineNumber>541</LineNumber>
+          <EnabledFlag>0</EnabledFlag>
+          <Address>134218730</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>../Src/main.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\MCU\../Src/main.c\541</Expression>
+        </Bp>
+        <Bp>
+          <Number>12</Number>
+          <Type>0</Type>
+          <LineNumber>535</LineNumber>
+          <EnabledFlag>0</EnabledFlag>
+          <Address>134218674</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>../Src/main.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\MCU\../Src/main.c\535</Expression>
+        </Bp>
+        <Bp>
+          <Number>13</Number>
+          <Type>0</Type>
+          <LineNumber>534</LineNumber>
+          <EnabledFlag>0</EnabledFlag>
+          <Address>134218664</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>../Src/main.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\MCU\../Src/main.c\534</Expression>
+        </Bp>
+        <Bp>
+          <Number>14</Number>
+          <Type>0</Type>
+          <LineNumber>540</LineNumber>
+          <EnabledFlag>0</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>../Src/main.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+        <Bp>
+          <Number>15</Number>
+          <Type>0</Type>
+          <LineNumber>546</LineNumber>
+          <EnabledFlag>0</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>../Src/main.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+        <Bp>
+          <Number>16</Number>
+          <Type>0</Type>
+          <LineNumber>550</LineNumber>
           <EnabledFlag>0</EnabledFlag>
           <Address>0</Address>
           <ByteObject>0</ByteObject>
@@ -443,6 +603,18 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
+      <PathWithFileName>..\Src\tools.c</PathWithFileName>
+      <FilenameWithoutPath>tools.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>2</GroupNumber>
+      <FileNumber>6</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
       <PathWithFileName>../Src/main.c</PathWithFileName>
       <FilenameWithoutPath>main.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
@@ -450,7 +622,7 @@
     </File>
     <File>
       <GroupNumber>2</GroupNumber>
-      <FileNumber>6</FileNumber>
+      <FileNumber>7</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -462,7 +634,7 @@
     </File>
     <File>
       <GroupNumber>2</GroupNumber>
-      <FileNumber>7</FileNumber>
+      <FileNumber>8</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -474,7 +646,7 @@
     </File>
     <File>
       <GroupNumber>2</GroupNumber>
-      <FileNumber>8</FileNumber>
+      <FileNumber>9</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -486,7 +658,7 @@
     </File>
     <File>
       <GroupNumber>2</GroupNumber>
-      <FileNumber>9</FileNumber>
+      <FileNumber>10</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -498,7 +670,7 @@
     </File>
     <File>
       <GroupNumber>2</GroupNumber>
-      <FileNumber>10</FileNumber>
+      <FileNumber>11</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -510,25 +682,13 @@
     </File>
     <File>
       <GroupNumber>2</GroupNumber>
-      <FileNumber>11</FileNumber>
+      <FileNumber>12</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
       <PathWithFileName>../Src/stm32f4xx_hal_msp.c</PathWithFileName>
       <FilenameWithoutPath>stm32f4xx_hal_msp.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>2</GroupNumber>
-      <FileNumber>12</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\Src\tools.c</PathWithFileName>
-      <FilenameWithoutPath>tools.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

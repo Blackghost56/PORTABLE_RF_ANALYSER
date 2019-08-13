@@ -67,6 +67,8 @@ extern ADC_HandleTypeDef hadc3;
 //extern uint8_t ADCConvCompltFlag;
 extern struct CustomADCStruct CADC;
 extern uint8_t triggerEvent;
+extern uint16_t USBTxTimeout;
+extern uint8_t USBTxTimeoutFlag;
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -197,6 +199,9 @@ void SysTick_Handler(void)
 	if ((CADC.state == STATE_ON) && (triggerEvent > 0))
 	{
 		CADC.startTime++;
+	}
+	if (USBTxTimeoutFlag == 1){
+		USBTxTimeout++;
 	}
   /* USER CODE END SysTick_IRQn 1 */
 }

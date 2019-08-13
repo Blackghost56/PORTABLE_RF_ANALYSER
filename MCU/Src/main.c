@@ -58,7 +58,10 @@ struct CustomADCStruct CADC;
 
 uint8_t USBBufTx[USBBufTxSize];
 struct CQueue	USBBufRxQ;
+//struct CQueue	USBBufTxQ;
 int USBBufRxQOverload = 0;
+uint16_t USBTxTimeout = 0;
+uint8_t USBTxTimeoutFlag = 0;
 uint8_t		triggerEvent;
 uint16_t 	ADCBufSize = ADC_BUF_SIZE_DEFAULT;
 
@@ -74,6 +77,7 @@ static void MX_ADC3_Init(void);
 /* USER CODE BEGIN PFP */
 void USB_RX_handler(void);
 void ADC_ContConv_handler(void);
+uint8_t USB_TX(uint8_t* Buf, uint16_t Len);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -90,6 +94,7 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 	CQueueInit(&USBBufRxQ, USBBufRxQSize);
+	//CQueueInit(&USBBufTxQ, USBBufTxQSize);
 	
 	// ADC custom struct init
 	CADC.data = (uint16_t *)malloc(sizeof(uint16_t) * ADC_BUF_SIZE_DEFAULT);
@@ -220,7 +225,7 @@ static void MX_ADC1_Init(void)
   /** Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion) 
   */
   hadc1.Instance = ADC1;
-  hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
+  hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2;
   hadc1.Init.Resolution = ADC_RESOLUTION_12B;
   hadc1.Init.ScanConvMode = DISABLE;
   hadc1.Init.ContinuousConvMode = ENABLE;
@@ -279,10 +284,10 @@ static void MX_ADC2_Init(void)
   /** Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion) 
   */
   hadc2.Instance = ADC2;
-  hadc2.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
+  hadc2.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2;
   hadc2.Init.Resolution = ADC_RESOLUTION_12B;
   hadc2.Init.ScanConvMode = DISABLE;
-  hadc2.Init.ContinuousConvMode = DISABLE;
+  hadc2.Init.ContinuousConvMode = ENABLE;
   hadc2.Init.DiscontinuousConvMode = DISABLE;
   hadc2.Init.DataAlign = ADC_DATAALIGN_RIGHT;
   hadc2.Init.NbrOfConversion = 1;
@@ -327,10 +332,10 @@ static void MX_ADC3_Init(void)
   /** Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion) 
   */
   hadc3.Instance = ADC3;
-  hadc3.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
+  hadc3.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2;
   hadc3.Init.Resolution = ADC_RESOLUTION_12B;
   hadc3.Init.ScanConvMode = DISABLE;
-  hadc3.Init.ContinuousConvMode = DISABLE;
+  hadc3.Init.ContinuousConvMode = ENABLE;
   hadc3.Init.DiscontinuousConvMode = DISABLE;
   hadc3.Init.DataAlign = ADC_DATAALIGN_RIGHT;
   hadc3.Init.NbrOfConversion = 1;
@@ -440,13 +445,17 @@ void ADC_ContConv_handler(){
 		
 		USBBufTx[0]= USB_0_DATA;
 		USBBufTx[1] = USB_1_DATA_ADC_CONTCONV;
-		memcpy(&USBBufTx[2], CADC.data, ADCBufSize);
-		//USBBufTx[USBBufTxSize - 1] = '\r';
-		//CDC_Transmit_FS(USBBufTx, USBBufTxSize);
-		//CADC.ADCDataBuf[0] = USB_0_DATA;
-		//CADC.ADCDataBuf[1] = USB_1_DATA_ADC_CONTCONV;
-		//CDC_Transmit_FS((uint8_t*)CADC.data, ADCBufSize);
-		CDC_Transmit_FS(USBBufTx, ADCBufSize + 2);
+		memcpy(&USBBufTx[2], CADC.data, ADCBufSize * 2);
+		volatile uint8_t result = USB_TX(USBBufTx, ADCBufSize * 2 + 2);
+		/*
+		volatile uint8_t result;
+		for (int i = 0; i < (ADCBufSize / 62 + 1); i++){
+			USBBufTx[0]= USB_0_DATA;
+			USBBufTx[1] = USB_1_DATA_ADC_CONTCONV;
+			memcpy(&USBBufTx[2], &CADC.data[i * 62], 62);
+			result = USB_TX(USBBufTx, 62 + 2);
+			HAL_Delay(100);
+		}*/
 		
 				
 		//MX_DMA_Init();
@@ -602,8 +611,21 @@ void USB_RX_handler(){
 		USBBufTx[2] = i;					// amount of data received from FIFO
 		CDC_Transmit_FS(USBBufTx, 3);
 		//HAL_Delay(5000);				// for FIFO overload test
+	}
 }
 
+uint8_t USB_TX(uint8_t* Buf, uint16_t Len){
+	USBTxTimeoutFlag = 1;
+	uint8_t result = CDC_Transmit_FS(Buf, Len);
+	while ((result != USBD_OK)){
+		result = CDC_Transmit_FS(Buf, Len);
+		if (USBTxTimeout > USB_TX_TIMEOUT){
+			USBTxTimeoutFlag = 0;
+			return result; 
+		}	
+	}
+	USBTxTimeoutFlag = 0;
+	return result; 
 }
 
 

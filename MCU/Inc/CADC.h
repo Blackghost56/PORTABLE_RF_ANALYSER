@@ -3,7 +3,7 @@
 
 #include "stdint.h"
 
-#define ADC_BUF_SIZE_DEFAULT 512
+#define ADC_BUF_SIZE_DEFAULT 40
 #define ADC_MAX_BUF_SIZE 1024
 #define ADC_MIN_BUF_SIZE  3
 #define ADC_WHATCHDOG_TIMEOUT 100		// ms

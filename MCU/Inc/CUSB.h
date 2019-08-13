@@ -3,6 +3,8 @@
 
 #define USBBufTxSize 2048
 #define USBBufRxQSize 10
+#define USB_TX_TIMEOUT	100 // ms
+//#define USBBufTxQSize 10
 
 
 #define USB_0_CMD 			0xAA
