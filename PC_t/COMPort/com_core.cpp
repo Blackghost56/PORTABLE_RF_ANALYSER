@@ -56,7 +56,7 @@ void COM_core::handleBytesWritten(qint64 bytes)
 {
     if (bytes == g_bytesWritten) {
         g_bytesWritten = -1;
-        qDebug() << tr("Data successfully sent to port %1").arg(serialPort.portName());
+        //qDebug() << tr("Data successfully sent to port %1").arg(serialPort.portName());
     }
 }
 

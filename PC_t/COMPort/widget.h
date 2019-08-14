@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QtSerialPort/QSerialPortInfo>
 #include <QTimer>
+#include <QTime>
 #include <QMap>
 #include <QDebug>
 #include <QHBoxLayout>
@@ -43,14 +44,16 @@ private:
     bool                    stateDevice = STATE_OFF;
     QCustomPlot             *pPlot;
     QVector<double>         ADCData;
-    quint16                 ADCBufSize;         // 2 byte 1 point (real size in byte x2)
+    quint16                 ADCBufSize = 40;         // 2 byte 1 point (real size in byte x2)
 
 
 
     void buildBaudRateMap();
     void connectPort();
     void disconnectPort();
-    void RAWdataOut(const QByteArray &data, const int str_length = 50);
+    void TxData(const QByteArray &data, const QString log_str = "");
+    void addDataToLog(const QString log_str);
+
     void parser(const QByteArray &data);
 
     void parserData(const QByteArray &data);
@@ -59,6 +62,9 @@ private:
 
     void parserInfo(const QByteArray &data);
     void parserInfoADCState(const bool &state);
+    void parserInfoRxFIFOClear(const QByteArray &data);
+
+    void parserError(const QByteArray &data);
 
     void drawPlot();
     void requestADCBufSize();

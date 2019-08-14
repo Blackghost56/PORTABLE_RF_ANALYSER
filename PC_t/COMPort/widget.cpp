@@ -95,8 +95,8 @@ void Widget::on_BaudRate_comboBox_currentIndexChanged(const QString &arg1)
         return;
     }
     baudRate = baudRateMap[arg1];
-    ui->Log_plainTextEdit->appendPlainText("Baud rate: " + QString::number(baudRate));
-    qDebug() << "Baud rate: " << baudRate;
+    addDataToLog("Baud rate: " + QString::number(baudRate));
+    //qDebug() << "Baud rate: " << baudRate;
 }
 
 void Widget::on_Port_comboBox_currentIndexChanged(const QString &arg1)
@@ -106,8 +106,8 @@ void Widget::on_Port_comboBox_currentIndexChanged(const QString &arg1)
         return;
     }
     port = arg1;
-    ui->Log_plainTextEdit->appendPlainText("Port: " + port);
-    qDebug() << "Port: " << port;
+    addDataToLog("Port: " + port);
+    //qDebug() << "Port: " << port;
 }
 
 void Widget::connectPort()
@@ -122,6 +122,23 @@ void Widget::disconnectPort()
     ui->Port_pushButton->setText(portButtonTextOn);
     ui->Port_pushButton->setChecked(false);
     pCOMCore->close();
+}
+
+void Widget::TxData(const QByteArray &data, const QString log_str)
+{
+    addDataToLog("< Tx\t" + QTime::currentTime().toString("[hh:mm:ss.zzz]"));
+    addDataToLog(log_str);
+    if (ui->Log_OnOff_checkBox->isChecked()){
+        Tools::RAWdataOut(ui->Log_plainTextEdit, data);
+    }
+    pCOMCore->write(data);
+}
+
+void Widget::addDataToLog(const QString log_str)
+{
+    if (ui->Log_OnOff_checkBox->isChecked()){
+        ui->Log_plainTextEdit->appendPlainText(log_str);
+    }
 }
 
 void Widget::on_Port_pushButton_clicked()
@@ -139,27 +156,11 @@ void Widget::on_Port_pushButton_clicked()
 
 void Widget::readyRead(QByteArray &data)
 {
-    //qDebug() << data;
-    RAWdataOut(data);
+    addDataToLog("> Rx\t" + QTime::currentTime().toString("[hh:mm:ss.zzz]"));
     parser(data);
-
-}
-
-void Widget::RAWdataOut(const QByteArray &data, const int str_length)
-{
-    QString str;
-    for (int i = 0; i < data.length(); i++){
-        if ((i % str_length == 0) && (i != 0))
-        {
-            //qDebug() << str;
-            ui->Log_plainTextEdit->appendPlainText(str);
-            str.clear();
-        }
-        str.push_back(QString("%1 ").arg(quint8(data.at(i)), 2, 16, QChar('0')));
+    if (ui->Log_OnOff_checkBox->isChecked()){
+        Tools::RAWdataOut(ui->Log_plainTextEdit, data);
     }
-    if (!str.isEmpty())
-        ui->Log_plainTextEdit->appendPlainText(str);
-    //qDebug() << str;
 }
 
 void Widget::parser(const QByteArray &data)
@@ -175,6 +176,7 @@ void Widget::parser(const QByteArray &data)
                 parserInfo(data);
             break;
             case USB_0_ERROR:
+                parserError(data);
             break;
         }
     }
@@ -202,6 +204,7 @@ void Widget::parserDATAADCBufSize(const QByteArray &data)
     QByteArray buf = data.mid(2, 4);
     ADCBufSize = quint16(Tools::RAWToNumberMSB(buf, 0, 2));
     ui->Time_lineEdit->setText(QString::number(ADCBufSize * ADC_TIME_DISCRETE_NS / 1000.0));
+    addDataToLog("DATA_ADC_BUF_SIZE " + QString::number(ADCBufSize));
 }
 
 void Widget::parserDATAADC(const QByteArray &data)
@@ -215,7 +218,8 @@ void Widget::parserDATAADC(const QByteArray &data)
         return;
     for (quint16 i = 0; i < buf.length(); i+=2)
         ADCData.push_back(double(quint16(Tools::RAWToNumberLSB(buf, i, 2))) * ADC_SCALE);
-    qDebug() << ADCData;
+    addDataToLog("DATA_ADC_CONTCONV ");
+    //qDebug() << ADCData;
     drawPlot();
 }
 
@@ -224,10 +228,10 @@ void Widget::parserInfo(const QByteArray &data)
     if (data.length() >= 2){
         switch (uint8_t(data.at(1))) {
         case USB_1_INFO_RX_FIFO_CLEAR:
-
+                parserInfoRxFIFOClear(data);
             break;
         case USB_1_INFO_ADC_SET_BUF_SIZE_OK:
-
+                addDataToLog("ADC_SET_BUF_SIZE_OK");
             break;
         case USB_1_INFO_ADC_STATE_ON:
                 parserInfoADCState(STATE_ON);
@@ -245,10 +249,50 @@ void Widget::parserInfoADCState(const bool &state)
         stateDevice = STATE_ON;
         ui->Start_pushButton->setText(stateButtonTextOn);
         ui->Time_lineEdit->setEnabled(false);
+        addDataToLog("INFO_ADC_STATE_ON");
     } else {
         stateDevice = STATE_OFF;
         ui->Start_pushButton->setText(stateButtonTextOff);
         ui->Time_lineEdit->setEnabled(true);
+        addDataToLog("INFO_ADC_STATE_OFF");
+    }
+}
+
+void Widget::parserInfoRxFIFOClear(const QByteArray &data)
+{
+    if (data.length() < 3){
+        return;
+    }
+    quint8 buf = quint8(data.at(2));
+    addDataToLog("INFO_RX_FIFO_CLEAR. Amount of data received from FIFO: " + QString::number(buf));
+}
+
+void Widget::parserError(const QByteArray &data)
+{
+    if (data.length() >= 2){
+        switch (uint8_t(data.at(1))) {
+        case USB_1_ERROR_ADC_CONTCONV_START:
+                addDataToLog("ERROR_ADC_CONTCONV_START");
+            break;
+        case USB_1_ERROR_ADC_CONTCONV_STOP:
+                addDataToLog("ERROR_ADC_CONTCONV_STOP");
+            break;
+        case USB_1_ERROR_ADC_SET_BUF_SIZE_ADCRUN:
+                addDataToLog("ERROR_ADC_SET_BUF_SIZE_ADCRUN");
+            break;
+        case USB_1_ERROR_ADC_SET_BUF_SIZE_UPPERLIMIT:
+                addDataToLog("ERROR_ADC_SET_BUF_SIZE_UPPERLIMIT");
+            break;
+        case USB_1_ERROR_ADC_SET_BUF_SIZE_LOWERLIMIT:
+                addDataToLog("ERROR_ADC_SET_BUF_SIZE_LOWERLIMIT");
+            break;
+        case USB_1_ERROR_USB_FIFO_OVERLOAD:
+                addDataToLog("ERROR_USB_FIFO_OVERLOAD");
+            break;
+        case USB_1_ERROR_COMMON:
+                addDataToLog("ERROR_COMMON");
+            break;
+        }
     }
 }
 
@@ -260,21 +304,20 @@ void Widget::on_Start_pushButton_clicked()
         ui->Start_pushButton->setText(stateButtonTextOff);
         buf.push_back(char(USB_0_CMD));
         buf.push_back(char(USB_1_CMD_ADC_CONTCONV_STOP));
-        pCOMCore->write(buf);
+        TxData(buf, "CMD_ADC_CONTCONV_STOP");
         ui->Time_lineEdit->setEnabled(true);
     } else {
         stateDevice = STATE_ON;
         ui->Start_pushButton->setText(stateButtonTextOn);
         buf.push_back(char(USB_0_CMD));
         buf.push_back(char(USB_1_CMD_ADC_CONTCONV_START));
-        pCOMCore->write(buf);
+        TxData(buf, "CMD_ADC_CONTCONV_START");
         ui->Time_lineEdit->setEnabled(false);
     }
 }
 
 void Widget::drawPlot()
 {
-    //qDebug() << "Draw plot";
     if (pPlot->isHidden())
         return;
 
@@ -323,7 +366,7 @@ void Widget::requestADCBufSize()
     QByteArray buf;
     buf.push_back(char(USB_0_CMD));
     buf.push_back(char(USB_1_CMD_ADC_REQUEST_BUF_SIZE));
-    pCOMCore->write(buf);
+    TxData(buf, "CMD_ADC_REQUEST_BUF_SIZE");
 }
 
 void Widget::setADCBufSize(const int size)
@@ -332,7 +375,7 @@ void Widget::setADCBufSize(const int size)
     buf.push_back(char(USB_0_DATA));
     buf.push_back(char(USB_1_DATA_ADC_BUF_SIZE));
     buf.push_back(Tools::NumberToRAWMSB(quint64(size), 2));
-    pCOMCore->write(buf);
+    TxData(buf, QString("DATA_ADC_BUF_SIZE " + QString::number(size)));
     Tools::delay(5);
     requestADCBufSize();
 }
@@ -342,7 +385,7 @@ void Widget::requestADCState()
     QByteArray buf;
     buf.push_back(char(USB_0_CMD));
     buf.push_back(char(USB_1_CMD_ADC_REQUEST_STATE));
-    pCOMCore->write(buf);
+    TxData(buf, "CMD_ADC_REQUEST_STATE");
 }
 
 void Widget::on_Time_lineEdit_editingFinished()
@@ -367,7 +410,7 @@ void Widget::on_pushButton_2_clicked()
     QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
     {
-        qWarning() << "Error opening file";
+        addDataToLog("Error opening file");
         return;
     }
 

@@ -5,6 +5,21 @@ Tools::Tools(QObject *parent) : QObject(parent)
 
 }
 
+void Tools::RAWdataOut(QPlainTextEdit *plainText, const QByteArray &data, const int str_length)
+{
+    QString str;
+    for (int i = 0; i < data.length(); i++){
+        if ((i % str_length == 0) && (i != 0))
+        {
+            plainText->appendPlainText(str);
+            str.clear();
+        }
+        str.push_back(QString("%1 ").arg(quint8(data.at(i)), 2, 16, QChar('0')));
+    }
+    if (!str.isEmpty())
+        plainText->appendPlainText(str);
+}
+
 int Tools::lineEditIntValueCheck(QLineEdit &LineEdit, const int min, const int max, QString label)
 {
     int buf = 0;

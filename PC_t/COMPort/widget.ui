@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Widget</string>
+   <string>STM32 Multi ADC (7.2 MSPS) + USB(VCP) Demo</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
@@ -29,7 +29,7 @@
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <widget class="QWidget" name="">
+         <widget class="QWidget" name="layoutWidget">
           <layout class="QHBoxLayout" name="horizontalLayout_3">
            <item>
             <layout class="QVBoxLayout" name="verticalLayout">
@@ -139,17 +139,24 @@
               <string/>
              </property>
              <layout class="QGridLayout" name="gridLayout_2">
-              <item row="0" column="0">
+              <item row="2" column="0">
+               <widget class="QPushButton" name="pushButton_2">
+                <property name="text">
+                 <string>Save to file</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
                <widget class="QPushButton" name="pushButton">
                 <property name="text">
                  <string>Clear</string>
                 </property>
                </widget>
               </item>
-              <item row="1" column="0">
-               <widget class="QPushButton" name="pushButton_2">
+              <item row="0" column="0">
+               <widget class="QCheckBox" name="Log_OnOff_checkBox">
                 <property name="text">
-                 <string>Save to file</string>
+                 <string>Log On/Off</string>
                 </property>
                </widget>
               </item>
