@@ -209,18 +209,26 @@ void Widget::parserDATAADCBufSize(const QByteArray &data)
 
 void Widget::parserDATAADC(const QByteArray &data)
 {
-    if (data.length() <= 2){
+    if (data.length() <= 4){
+        qDebug() << "data length <=4" << data.length();
         return;
     }
-    QByteArray buf = data.mid(2, data.length());
-    ADCData.clear();
+    if (data.length() > (ADCBufSize * 2 + 4)){
+        qDebug() << "data.length() > (ADCBufSize * 2 + 4)" << ADCBufSize * 2 + 4;
+        return;
+    }
+
+    QByteArray buf = data.mid(4, data.length());
+    if (data.at(3) == 0)
+        ADCData.clear();
     if (buf.length() % 2 != 0)
         return;
     for (quint16 i = 0; i < buf.length(); i+=2)
         ADCData.push_back(double(quint16(Tools::RAWToNumberLSB(buf, i, 2))) * ADC_SCALE);
     addDataToLog("DATA_ADC_CONTCONV ");
     //qDebug() << ADCData;
-    drawPlot();
+    if ((data.at(2) - 1) == data.at(3))
+        drawPlot();
 }
 
 void Widget::parserInfo(const QByteArray &data)
@@ -390,7 +398,7 @@ void Widget::requestADCState()
 
 void Widget::on_Time_lineEdit_editingFinished()
 {
-    double buf = Tools::lineEditDoubleValueCheck(*ui->Time_lineEdit, 1.0, 200.0);
+    double buf = Tools::lineEditDoubleValueCheck(*ui->Time_lineEdit, ADC_MIN_TIME_LENGTH, ADC_MAX_TIME_LENGTH);
     ADCBufSize = quint16(buf * 1000.0 / double(ADC_TIME_DISCRETE_NS));
     setADCBufSize(ADCBufSize);
 }

@@ -28,6 +28,7 @@
 #include "CUSB.h"
 #include "CADC.h"
 #include "tools.h"
+#include "math.h"
 
 
 /* USER CODE END Includes */
@@ -77,7 +78,8 @@ static void MX_ADC3_Init(void);
 /* USER CODE BEGIN PFP */
 void USB_RX_handler(void);
 void ADC_ContConv_handler(void);
-uint8_t USB_TX(uint8_t* Buf, uint16_t Len);
+uint8_t USB_TX(uint8_t* data, uint16_t data_length);
+uint8_t USB_TX_Part(uint8_t* data, uint16_t data_length, uint16_t part_length);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -130,18 +132,7 @@ int main(void)
   MX_ADC3_Init();
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 2 */
-  /*if(HAL_ADC_Start(&hadc3) != HAL_OK)
-    Error_Handler();
-  if(HAL_ADC_Start(&hadc2) != HAL_OK)
-    Error_Handler();
-  if(HAL_ADCEx_MultiModeStart_DMA(&hadc1, (uint32_t*)CADC.ADCDataBuf, ADCBufSize) != HAL_OK)
-    Error_Handler();
-	CADC.ADCState = STATE_ON;
-	CADC.ADCStartTime = SysTick->VAL;*/
-	
-	//volatile int i = 0;
-	//volatile uint8_t res = 0;
-	//USBBufTx[7] = '\n';
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -443,10 +434,14 @@ void ADC_ContConv_handler(){
 			Error_Handler();
 		CADC.state = STATE_OFF;
 		
+		/*
 		USBBufTx[0]= USB_0_DATA;
 		USBBufTx[1] = USB_1_DATA_ADC_CONTCONV;
 		memcpy(&USBBufTx[2], CADC.data, ADCBufSize * 2);
-		volatile uint8_t result = USB_TX(USBBufTx, ADCBufSize * 2 + 2);
+		volatile uint8_t result = USB_TX(USBBufTx, ADCBufSize * 2 + 2);*/
+		
+		USB_TX_Part((uint8_t *)&CADC.data, ADCBufSize * 2, USBBufTxSize);
+		
 		/*
 		volatile uint8_t result;
 		for (int i = 0; i < (ADCBufSize / 62 + 1); i++){
@@ -627,11 +622,11 @@ void USB_RX_handler(){
 	}
 }
 
-uint8_t USB_TX(uint8_t* Buf, uint16_t Len){
+uint8_t USB_TX(uint8_t* data, uint16_t data_length){
 	USBTxTimeoutFlag = 1;
-	uint8_t result = CDC_Transmit_FS(Buf, Len);
+	uint8_t result = CDC_Transmit_FS(data, data_length);
 	while ((result != USBD_OK)){
-		result = CDC_Transmit_FS(Buf, Len);
+		result = CDC_Transmit_FS(data, data_length);
 		if (USBTxTimeout > USB_TX_TIMEOUT){
 			USBTxTimeoutFlag = 0;
 			return result; 
@@ -641,6 +636,33 @@ uint8_t USB_TX(uint8_t* Buf, uint16_t Len){
 	return result; 
 }
 
+uint8_t USB_TX_Part(uint8_t* data, uint16_t data_length, uint16_t part_length){
+	uint8_t result = 0; 
+
+	uint16_t payload_length = part_length - 4;
+	//uint8_t number_pack = data_length / payload_length + data_length % payload_length;
+	uint8_t number_pack = ceil((double)data_length / (double)payload_length);
+	uint16_t tail = data_length % payload_length;
+	USBBufTx[2] = number_pack;
+	
+	
+	
+	for(uint8_t i = 0; i < number_pack; i++){
+		USBBufTx[0]= USB_0_DATA;
+		USBBufTx[1] = USB_1_DATA_ADC_CONTCONV;
+		USBBufTx[2] = number_pack;
+		USBBufTx[3] = i;
+		if ((i == (number_pack - 1)) && (tail != 0)){
+			memcpy(&USBBufTx[4], (uint8_t *)&CADC.data[i * payload_length], tail);
+			result = USB_TX(USBBufTx, tail + 4);
+		} else {
+			memcpy(&USBBufTx[4], (uint8_t *)&CADC.data[i * payload_length], payload_length);
+			result = USB_TX(USBBufTx, part_length);
+		}
+		HAL_Delay(10);
+	}
+	return result;
+}
 
 /* USER CODE END 4 */
 

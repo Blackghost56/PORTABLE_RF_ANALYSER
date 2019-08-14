@@ -49,3 +49,4 @@ mcu\main.o: ../Inc/queue_array.h
 mcu\main.o: ../Inc/CUSB.h
 mcu\main.o: ../Inc/CADC.h
 mcu\main.o: ../Inc/tools.h
+mcu\main.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h

@@ -33,7 +33,9 @@ private:
     static constexpr const double            ADC_REF_V = 3.3;       // V
     static constexpr const double            ADC_BIT = 4096;
     static constexpr const double            ADC_SCALE = ADC_REF_V/ADC_BIT;
-    static constexpr const int               ADC_TIME_DISCRETE_NS = 140;  //ns
+    static constexpr const int               ADC_TIME_DISCRETE_NS = 140;    //ns
+    static constexpr const double            ADC_MIN_TIME_LENGTH = 1.0;     // us
+    static constexpr const double            ADC_MAX_TIME_LENGTH = 2000.0;  // us
 
     QTimer                  *pTimerUpdate;
     QStringList             portList;
